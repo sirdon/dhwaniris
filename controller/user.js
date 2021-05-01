@@ -35,6 +35,10 @@ exports.login = async (req, res) => {
       { _id: user._id, name, username, last_login: new_last_login },
       process.env.JWT_SECRET
     );
+    // store token in cookie
+    res.cookie("token", token, {
+      httponly: true,
+    });
 
     return res.json({
       message: "Login successfull.",
@@ -62,7 +66,11 @@ exports.logout = async (req, res) => {
     }
     user.is_login = false;
     await user.save();
-    //add token expire code
+    //clear cookie
+    res.cookie("token", "", {
+      httponly: true,
+      expires: new Date(0),
+    });
     return res.json({
       success: true,
       status: 200,
